@@ -1,53 +1,55 @@
 <?php
-
+/**
+ * @project     MSDS Fontera
+ * @author      Fajar Agus Maulana
+ * @copyright   Copyright (c) 2022, https://github.com/fajaramaulana/
+ * @link 		https://github.com/fajaramaulana/
+*/
 namespace App\Http\Controllers;
 
-use App\Models\Faq;
+use App\Models\Departement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 
-class FaqController extends Controller
+class DepartementController extends Controller
 {
 
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Faq::select('id','question', 'answer', 'status', 'created_at');
+            $data = Departement::select('id','name', 'email');
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
 
-                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ', \'' . $row->question . '\')">Edit</button>';
+                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ', \'' . $row->name . '\')">Edit</button>';
 
                     return $btn;
-                })
-                ->addColumn('status', function ($row) {
-                    return $row->status == 1 ? "Active" : "Non active";
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        return view('admin.faq.index');
+        return view('admin.departement.index');
     }
 
     public function create()
     {
-        return view('admin.faq.create');
+        return view('admin.departement.create');
     }
 
     public function store(Request $request)
     {
         $rules = array(
-            'question' => 'required|min:5',
-            'answer' => 'required|min:2',
+            'name' => 'required|min:5',
+            'email' => 'required|regex:/^.+@.+$/i',
         );
 
         $messages = array(
-            'question.required' => 'Pertanyaan is required.',
-            'question.min' => 'Pertanyaan min 5 character.',
-            'answer.required' => 'Jawaban is required.',
-            'answer.min' => 'Jawaban min 2 character.',
+            'name.required' => 'Nama Departement is required.',
+            'name.min' => 'Nama Departement min 5 character.',
+            'email.required' => 'Email is required.',
+            'email.regex' => 'Bukan Format Email.',
         );
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -59,10 +61,9 @@ class FaqController extends Controller
             ];
         } else {
             try {
-                Faq::create([
-                    'question' => $request->question,
-                    'answer'  => $request->answer,
-                    'status' => $request->status,
+                Departement::create([
+                    'name' => $request->name,
+                    'email'  => $request->email
                 ]);
             } catch (\Throwable $th) {
                 return [
@@ -73,7 +74,7 @@ class FaqController extends Controller
 
             return [
                 'success' => 1,
-                'message' => "Success Create FAQ"
+                'message' => "Success Create Departement"
             ];
         }
     }
@@ -81,9 +82,9 @@ class FaqController extends Controller
 
     public function edit($id)
     {
-        $testimoni = Faq::select('id', 'question', 'answer','status')->findorfail($id);
-        return view('admin.faq.edit', [
-            "faq" => $testimoni
+        $departement = Departement::select('id', 'name', 'email')->findorfail($id);
+        return view('admin.departement.edit', [
+            "departement" => $departement
         ]);
     }
 
@@ -91,15 +92,15 @@ class FaqController extends Controller
     public function update(Request $request, $id)
     {
         $rules = array(
-            'question' => 'required|min:5',
-            'answer' => 'required|min:2',
+            'name' => 'required|min:5',
+            'email' => 'required|regex:/^.+@.+$/i',
         );
 
         $messages = array(
-            'question.required' => 'Pertanyaan is required.',
-            'question.min' => 'Pertanyaan min 5 character.',
-            'answer.required' => 'Jawaban is required.',
-            'answer.min' => 'Jawaban min 2 character.',
+            'name.required' => 'Nama Departement is required.',
+            'name.min' => 'Nama Departement min 5 character.',
+            'email.required' => 'Email is required.',
+            'email.regex' => 'Bukan Format Email.',
         );
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -110,11 +111,10 @@ class FaqController extends Controller
                 'message' => $validator->errors()
             ];
         } else {
-            $testimoni = Faq::findorfail($id);
+            $testimoni = Departement::findorfail($id);
             $testimoni_data = [
-                'question'  => $request->question,
-                'answer'  => $request->answer,
-                'status' => $request->status,
+                'name'  => $request->name,
+                'email'  => $request->email,
             ];
 
             try {
@@ -128,7 +128,7 @@ class FaqController extends Controller
 
             return [
                 'success' => 1,
-                'message' => "Success Update FAQ"
+                'message' => "Success Update Departement"
             ];
         }
     }

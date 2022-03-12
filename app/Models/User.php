@@ -1,9 +1,13 @@
 <?php
+/**
+ * @project     MSDS Fontera
+ * @author      Fajar Agus Maulana
+ * @copyright   Copyright (c) 2022, https://github.com/fajaramaulana/
+ * @link 		https://github.com/fajaramaulana/
+*/
 
 namespace App\Models;
 
-use App\Berita;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 

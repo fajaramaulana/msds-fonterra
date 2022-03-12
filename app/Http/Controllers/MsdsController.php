@@ -1,67 +1,85 @@
 <?php
 
+/**
+ * @project     MSDS Fontera
+ * @author      Fajar Agus Maulana
+ * @copyright   Copyright (c) 2022, https://github.com/fajaramaulana/
+ * @link 		https://github.com/fajaramaulana/
+ */
+
 namespace App\Http\Controllers;
 
-use App\Models\Bahan;
+use App\Models\Msds;
+use App\Models\Departement;
 use App\Models\Listjasa;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 
-class BahanController extends Controller
+class MsdsController extends Controller
 {
     public function index(Request $request)
     {
+        $reqId = $request->get('departement_id');
+        $departements = Departement::select('id', 'name')->orderBy('name', 'desc')->get();
         if ($request->ajax()) {
-            $data = Bahan::join('listjasas', 'bahans.id_jasa', '=', 'listjasas.id')
-                ->select('listjasas.name as jasa', 'bahans.id', 'bahans.nama_bahan', 'bahans.image', 'bahans.created_at', 'bahans.status');
+            $data = Msds::join('departements', 'Msds.departement_id', '=', 'departements.id')
+                ->select('departements.name', 'msds.id', 'msds.chemical_common_name', 'msds.sds_issue_date', 'msds.expired_date', 'msds.chemical_supplier', 'msds.cas_number');
+            if ($request->get('departement_id') || $request->get('departement_id') == '0') {
+                $data = $data->where('departement_id', $request->get('departement_id'));
+            }
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
 
-                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ', \'' . $row->nama_bahan . '\')">Edit</button>';
+                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ', \'' . $row->cas_number . '\')">Edit</button> <button class="btn btn-sm btn-primary" onclick="return detail(' . $row->id . ')">Detail</button>';
 
                     return $btn;
-                })
-                ->addColumn('gambar', function ($row) {
-                    if ($row->image != null) {
-                        $url = env('PATH_IMAGE') . $row->image;
-                        return '<img src="' . $url . '" border="0" width="40" class="img-rounded" align="center" />';
-                    } else {
-                        return 'Deleted';
-                    }
-                })
-                ->addColumn('status', function ($row) {
-                    return $row->status == 1 ? "Active" : "Non active";
                 })
                 ->rawColumns(['action', 'gambar'])
                 ->make(true);
         }
-        return view('admin.bahan.index');
+        return view('admin.msds.index', [
+            "departements" => $departements,
+            "reqId" => $reqId
+        ]);
     }
-
 
     public function create()
     {
-        $jasa = Listjasa::select('id', 'name')->where("status", 1)->orderBy('name', 'desc')->get();
-        return view('admin.bahan.create', [
-            "jasas" => $jasa,
+        $departements = Departement::select('id', 'name')->orderBy('name', 'desc')->get();
+        return view('admin.msds.create', [
+            "departements" => $departements,
         ]);
     }
 
     public function store(Request $request)
     {
         $rules = array(
-            'nama_bahan' => 'required',
-            'gambar' => 'mimes:jpeg,jpg,png|required|max:10000|dimensions:max_width=370,max_height=359,min_width=370,min_height=359',
-            'description' => 'required|max:140'
+            'departement_id' => 'required',
+            'chemical_common_name' => 'required',
+            'trade_name' => 'required',
+            'hsno_class' => 'required',
+            'sds_issue_date' => 'required',
+            'un_number' => 'required',
+            'cas_number' => 'required',
+            'chemical_supplier' => 'required',
+            'quantity_volume' => 'required',
+            'concentration' => 'required',
+            'packaging_size' => 'required',
+            'type_of_container' => 'required',
+            'location_of_chemical' => 'required',
+            'bulk_storage_tank' => 'required',
+            'signage_in_place' => 'required',
+            'bund_capacity' => 'required',
+            'bunding_material' => 'required',
+            'comments_other' => 'required',
+            'dokumen' => 'mimes:pdf,docx,doc,xls,xlsx|required'
         );
 
-        $messages = array(
-            'nama_bahan.required' => 'Nama Pola is required.',
-        );
-
-        $validator = Validator::make($request->all(), $rules, $messages);
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return [
@@ -69,40 +87,61 @@ class BahanController extends Controller
                 'message' => $validator->errors()
             ];
         } else {
-            if ($request->id_jasa == 0) {
+            if ($request->departement_id == 0) {
                 return [
                     'success' => 2,
-                    'message' => "Anda Harus Pilih Jasa Terlebih dahulu."
+                    'message' => "Anda Harus Pilih Departement Terlebih dahulu."
                 ];
             }
-            $gambar = $request->file('gambar');
-            $extension = $request->file('gambar')->guessExtension();
-            $newGambarName = slugify($request->nama_bahan) . "-" . randString(4) . "." . $extension;
-            $pathImage = base_path('..\mainData\bahan\\') . $newGambarName;
+            $dokumen = $request->file('dokumen');
+            $extension = $request->file('dokumen')->guessExtension();
+            $newGambarName = slugify($request->cas_number) . "-" . randString(4) . "." . $extension;
+            $pathImage = public_path('dokumen') . '\\' . $newGambarName;
             try {
-                $gambar->move(base_path('..\mainData\bahan'), $newGambarName);
+                $dokumen->move(public_path('dokumen') . '\\', $newGambarName);
+                DB::beginTransaction();
                 try {
-                    Bahan::create([
-                        'id_jasa' => $request->id_jasa,
-                        'nama_bahan'  => $request->nama_bahan,
-                        'description' => $request->description,
-                        'image' => 'bahan/' . $newGambarName,
-                        'status' => $request->status,
+                    $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(365)->format('Y-m-d');
+                    Msds::create([
+                        'departement_id' => $request->departement_id,
+                        'chemical_common_name' => $request->chemical_common_name,
+                        'trade_name' => $request->trade_name,
+                        'hsno_class' => $request->hsno_class,
+                        'sds_issue_date' => $request->sds_issue_date,
+                        'expired_date' => $expiredDate,
+                        'un_number' => $request->un_number,
+                        'cas_number' => $request->cas_number,
+                        'chemical_supplier' => $request->chemical_supplier,
+                        'quantity_volume' => $request->quantity_volume,
+                        'concentration' => $request->concentration,
+                        'packaging_size' => $request->packaging_size,
+                        'type_of_container' => $request->type_of_container,
+                        'location_of_chemical' => $request->location_of_chemical,
+                        'bulk_storage_tank' => $request->bulk_storage_tank,
+                        'signage_in_place' => $request->signage_in_place,
+                        'bund_capacity' => $request->bund_capacity,
+                        'bunding_material' => $request->bunding_material,
+                        'comments_other' => $request->comments_other,
+                        'path_pdf' => $newGambarName
+
                     ]);
                 } catch (\Throwable $th) {
                     unlink($pathImage);
+                    DB::rollback();
                     return [
                         'success' => 2,
                         'message' => "Error on store data to database. \n" . $th->getMessage()
                     ];
                 }
             } catch (\Throwable $th) {
+                DB::rollback();
+                unlink($pathImage);
                 return [
                     'success' => 2,
                     'message' => "Error on store image to storage. \n" . $th->getMessage()
                 ];
             }
-
+            DB::commit();
             return [
                 'success' => 1,
                 'message' => "Success Insert Bahan"
@@ -149,7 +188,7 @@ class BahanController extends Controller
         $bahan = Bahan::select('id', 'id_jasa', 'nama_bahan', 'description', 'image', 'status')->findorfail($id);
         return view('admin.bahan.edit', [
             "jasas" => $jasa,
-            "bahans" => $bahan
+            "msds" => $bahan
         ]);
     }
 
@@ -209,7 +248,7 @@ class BahanController extends Controller
                     'status' => $request->status,
                 ];
             } else {
-                if ($request->gambar == null && $request->status == 1 && $bahanUp['image'] == "" ) {
+                if ($request->gambar == null && $request->status == 1 && $bahanUp['image'] == "") {
                     return [
                         'success' => 2,
                         'message' => "You Need To Upload Image First before you Activate this Jasa."

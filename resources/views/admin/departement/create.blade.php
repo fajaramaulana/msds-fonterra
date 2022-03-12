@@ -1,29 +1,22 @@
 @extends('admin.template-admin.master')
-@section('title', 'FAQ')
-@section('sub-judul', 'Tambah Frequently Asked Question')
+@section('title', 'Departement')
+@section('sub-judul', 'Tambah Departement')
 @section('content')
     <form method="POST" id="form-faq" enctype="multipart/form-data">
         @csrf
         <div class="form-group">
-            <label>Pertanyaan</label>
-            <input type="text" class="form-control" id="question" name="question"
-                placeholder="Masukan Nama Pemesan">
+            <label>Nama Departement</label>
+            <input type="text" class="form-control" id="name" name="name"
+                placeholder="Masukan Nama Departement">
         </div>
         <div class="form-group">
-            <label>Jawaban</label>
-            <textarea class="form-control" name="answer" id="answer" cols="30" rows="10"></textarea>
-        </div>
-        <div class="form-group">
-            <label>Status</label>
-            <select class="form-control " name="status" id="status">
-                <option value="" holder disabled>PILIH Status</option>
-                <option value="1">Active</option>
-                <option value="0">Non Active</option>
-            </select>
+            <label>Email</label>
+            <input type="email" class="form-control" id="email" name="email"
+                placeholder="Masukan Email">
         </div>
         <div class="spinner-border"></div>
         <div class="form-group">
-            <button class="btn btn-primary btn-block">Simpan FAQ</button>
+            <button class="btn btn-primary btn-block">Simpan Departement</button>
         </div>
     </form>
 @endsection
@@ -35,7 +28,7 @@
             event.preventDefault();
             var formData = new FormData($(this)[0]);
             $.ajax({
-                url: '{{ route('faqbackend.store') }}',
+                url: '{{ route('departement.store') }}',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -56,7 +49,7 @@
                             type: "success",
                             icon: 'success'
                         }).then(() => {
-                            window.location.href = "{{ url('/faqbackend') }}";
+                            window.location.href = "{{ url('/departement') }}";
                         })
                     } else if (result.success == 2) {
                         swal({

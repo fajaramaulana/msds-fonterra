@@ -34,20 +34,15 @@
     </div>
     <div class="form-group">
         <label>Tipe User</label>
-        <select class="form-control" name="tipe">
-            <option value="1" holder
-                @if($user->tipe == 1) selected @endif>Administrator</option>
-                <option value="0" holder
-                @if($user->tipe == 0) selected @endif>Penulis</option>
+        <select class="form-control" name="departement_id">
+            <option value="">Pilih Departement</option>
+            @foreach($departements as $departement)
+            <option value="{{ $departement->id }}" {{ $user->departement_id == $departement->id ? 'selected' : '' }}>{{ $departement->name }}</option>
+            @endforeach
         </select>
     </div>
-
-
     <div class="form-group">
-        <button class="btn btn-primary btn-block">Update Sejarah</button>
+        <button class="btn btn-primary btn-block">Update User</button>
     </div>
 </form>
-
-
-
 @endsection

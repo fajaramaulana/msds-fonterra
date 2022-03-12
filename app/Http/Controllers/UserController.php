@@ -1,7 +1,15 @@
 <?php
+/**
+ * @project     MSDS Fontera
+ * @category    Authentication
+ * @author      Fajar Agus Maulana
+ * @copyright   Copyright (c) 2022, https://github.com/fajaramaulana/
+ * @link 		https://github.com/fajaramaulana/
+*/
 
 namespace App\Http\Controllers;
 
+use App\Models\Departement;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -25,7 +33,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('admin.user.create');
+        $departement = Departement::all();
+        return view('admin.user.create', compact('departement'));
     }
 
     /**
@@ -38,19 +47,19 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|min:3|max:50',
-            'email' => 'required|email',
-            'tipe' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'departement_id' => 'required',
             'password' => 'required|min:8'
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'tipe' => $request->tipe,
+            'departement_id' => $request->departement_id,
             'password' => bcrypt($request->password)
         ]);
 
-            return redirect()->route('user.index')->with('success', 'User Berhasil Ditambahkan');
+        return redirect()->route('user.index')->with('success', 'User Berhasil Ditambahkan');
     }
 
     /**
@@ -72,8 +81,9 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        $departements = Departement::all();
         $user = User::find($id);
-        return view('admin.user.edit',compact('user'));
+        return view('admin.user.edit', compact('user', 'departements'));
     }
 
     /**
@@ -85,22 +95,37 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'name' => 'required|min:3|max:50',
-            'tipe' => 'required',
-            'password' => 'required|min:8'
-        ]);
-
-
+        if ($_POST['password'] == '') {
+            $this->validate($request, [
+                'name' => 'required|min:3|max:50',
+                'departement_id' => 'required'
+            ]);
             $user_data = [
                 'name' => $request->name,
                 'tipe' => $request->tipe,
-                'password' => bcrypt($request->password)
+                'departement_id' => $request->departement_id
             ];
-            $user = User::find($id);
-            $user->update($user_data);
+        } else {
+            $this->validate($request, [
+                'name' => 'required|min:3|max:50',
+                'password' => 'required|min:8',
+                'departement_id' => 'required'
+            ]);
+            $user_data = [
+                'name' => $request->name,
+                'tipe' => $request->tipe,
+                'password' => bcrypt($request->password),
+                'departement_id' => $request->departement_id
+            ];
+        }
 
-            return redirect()->route('user.index')->with('success', "Berhasil Di Update");
+
+
+
+        $user = User::find($id);
+        $user->update($user_data);
+
+        return redirect()->route('user.index')->with('success', "Berhasil Di Update");
     }
 
     /**
@@ -116,5 +141,4 @@ class UserController extends Controller
 
         return redirect()->back()->with('success', 'User Berhasil Dihapus');
     }
-    
 }

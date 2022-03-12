@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * @project     MSDS Fontera
+ * @author      Fajar Agus Maulana
+ * @copyright   Copyright (c) 2022, https://github.com/fajaramaulana/
+ * @link 		https://github.com/fajaramaulana/
+*/
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -14,16 +19,14 @@ Route::group(['prefix' => 'msds'], function () {
         'verify' => false, // Email Verification Routes...
         'password/reset' => false,
         'password/confirm' => false
-      ]);
-
+    ]);
 });
 
-Route::group(['middleware' => ['auth', 'prevent-back-history']], function(){
+Route::group(['middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/home', 'HomeController@index')->name('home');
-    /* Admin */
-    Route::group(['middleware' =>'akses.admin'], function(){
-    Route::resource('/user','UserController');
-    Route::resource('/banner','BannerController');
+
+    Route::resource('/user', 'UserController');
+    Route::resource('/banner', 'BannerController');
     Route::post('/removeimagebanner', 'BannerController@removeImageBanner')->name('banner.removeImage');
     Route::resource('/listjasa', 'ListjasaController');
     Route::post('/removeimagejasa', 'ListjasaController@removeImageListJasa')->name('listjasa.removeImage');
@@ -32,16 +35,8 @@ Route::group(['middleware' => ['auth', 'prevent-back-history']], function(){
     Route::resource('/pola', 'PolaController');
     Route::post('/removeimagepola', 'PolaController@removeImagePortofolio')->name('pola.removeImage');
     Route::resource('/testimoni', 'TestimoniController');
-    Route::resource('/bahan', 'BahanController');
+    Route::resource('/msds', 'MsdsController');
     Route::post('/removeimagebahan', 'BahanController@removeImageBahan')->name('bahan.removeImage');
-    Route::resource('/faqbackend', 'FaqController');
+    Route::resource('/departement', 'DepartementController');
     Route::resource('/partner', 'PartnerController');
-    });
-    
 });
-
-
-
-
-
-

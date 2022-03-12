@@ -34,15 +34,8 @@
         <a href="{{ route('home')}}">KOAPGI</a>
       </div>
       <ul class="sidebar-menu">
-        <li class="{{ request()->is('home') ? 'active' : '' }}"><a class="nav-link" href="{{ route('home')}}"><i class="fas fa-home"></i> <span>Beranda</span></a></li>
-        <li class="{{ request()->is('banner','banner/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('banner.index')}}"><i class="fas fa-image"></i> <span>Banner</span></a></li>
-        <li class="{{ request()->is('partner','partner/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('partner.index')}}"><i class="fas fa-user-check"></i> <span>Partner</span></a></li>
-        <li class="{{ request()->is('testimoni','testimoni/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('testimoni.index')}}"><i class="fas fa-sticky-note"></i> <span>Testimoni</span></a></li>
-        <li class="{{ request()->is('portofoliomanagement','portofoliomanagement/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('portofoliomanagement.index')}}"><i class="fas fa-images"></i> <span>Portofolio</span></a></li>
-        <li class="{{ request()->is('listjasa','listjasa/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('listjasa.index')}}"><i class="fas fa-list-alt"></i> <span>List Jasa</span></a></li>
-        <li class="{{ request()->is('pola','pola/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('pola.index')}}"><i class="fas fa-list-alt"></i> <span>Pola</span></a></li>
-        <li class="{{ request()->is('bahan','bahan/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('bahan.index')}}"><i class="fas fa-list-alt"></i> <span>Bahan</span></a></li>
-        <li class="{{ request()->is('faqbackend','faqbackend/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('faqbackend.index')}}"><i class="fas fa-question"></i><span>FAQ</span></a></li>
+        <li class="{{ request()->is('msds','msds/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('msds.index')}}"><i class="fas fa-list-alt"></i> <span>MSDS</span></a></li>
+        <li class="{{ request()->is('departement','departement/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('departement.index')}}"><i class="fas fa-question"></i><span>Departement</span></a></li>
         <li class="{{ request()->is('user','user/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('user.index')}}"><i class="fas fa-users-cog"></i> <span>List User</span></a></li>
       </ul>
     </aside>

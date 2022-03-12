@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * @project     MSDS Fontera
+ * @author      Fajar Agus Maulana
+ * @copyright   Copyright (c) 2022, https://github.com/fajaramaulana/
+ * @link 		https://github.com/fajaramaulana/
+*/
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -23,6 +28,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view('admin.home');
     }
 }

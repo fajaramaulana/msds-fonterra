@@ -35,17 +35,6 @@
                                     </span>
                                 @enderror
                         </div>
-
-                        <div class="form-group row">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
-                                    </label>
-                                </div>
-                        </div>
-
                         <div class="form-group row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
@@ -55,9 +44,6 @@
                         </div>
                     </form>
                 </div>
-            </div>
-            <div class="simple-footer">
-              Copyright &copy; LaserCut
             </div>
           </div>
         </div>

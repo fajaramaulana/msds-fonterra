@@ -32,6 +32,7 @@ class CreateMsdsTable extends Migration
             $table->string('bulk_storage_tank');
             $table->string('signage_in_place');
             $table->string('bund_capacity');
+            $table->string('bunding_material');
             $table->string('comments_other');
             $table->text('path_pdf');
             $table->timestamps();

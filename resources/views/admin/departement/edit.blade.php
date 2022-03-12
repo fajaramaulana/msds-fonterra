@@ -1,39 +1,32 @@
 @extends('admin.template-admin.master')
-@section('title', 'FAQ')
-@section('sub-judul', 'Edit Frequently Asked Question')
+@section('title', 'Departement')
+@section('sub-judul', 'Edit Departement')
 @section('content')
 
-    <form enctype="multipart/form-data" id="form-faq">
+    <form enctype="multipart/form-data" id="form-departement">
         @csrf
         @method('PUT')
         <div class="form-group">
-            <label>Pertanyaan</label>
-            <input type="text" class="form-control" value="{{ $faq->question }}" name="question" id="question">
+            <label>Nama Departement</label>
+            <input type="text" class="form-control" value="{{ $departement->name }}" name="name" id="name">
         </div>
         <div class="form-group">
-            <label>Jawaban</label>
-            <textarea name="answer" id="answer" style="width: 100%; height: 200px !important;">{{ $faq->answer }}</textarea>
+            <label>Email</label>
+            <input type="email" class="form-control" value="{{ $departement->email }}" name="email" id="email">
         </div>
         <div class="form-group">
-            <select class="form-control " name="status" id="">
-                <option value="" holder disabled>PILIH Status</option>
-                <option value="1" {{ $faq->status == 1 ? 'selected' : '' }}>Active</option>
-                <option value="0" {{ $faq->status == 0 ? 'selected' : '' }}>Non Active</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-primary btn-block">Update FAQ</button>
+            <button class="btn btn-primary btn-block">Update Departement</button>
         </div>
     </form>
 @endsection
 
 @section('script')
     <script type="text/javascript">
-        $('#form-faq').submit(function(event) {
+        $('#form-departement').submit(function(event) {
             event.preventDefault();
             var formData = new FormData($(this)[0]);
             $.ajax({
-                url: '{{ route('faqbackend.update', $faq->id) }}',
+                url: '{{ route('departement.update', $departement->id) }}',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -54,7 +47,7 @@
                             showConfirmButton: false,
                             icon: 'success'
                         }).then(() => {
-                            window.location.href = "{{ url('/faq') }}";
+                            window.location.href = "{{ url('/departement') }}";
                         })
                     } else if (result.success == 2) {
                         swal({
