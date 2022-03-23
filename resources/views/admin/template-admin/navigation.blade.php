@@ -31,7 +31,7 @@
         <a href="{{ route('home')}}">Admin </a>
       </div>
       <div class="sidebar-brand sidebar-brand-sm">
-        <a href="{{ route('home')}}">KOAPGI</a>
+        <a href="{{ route('home')}}">Admin</a>
       </div>
       <ul class="sidebar-menu">
         <li class="{{ request()->is('msds','msds/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('msds.index')}}"><i class="fas fa-list-alt"></i> <span>MSDS</span></a></li>

@@ -68,7 +68,7 @@
                 <div class="form-group">
                     <label>Chemical Supplier<span style="color:red;">*</span></label>
                     <input type="text" class="form-control" id="chemical_supplier" name="chemical_supplier"
-                        placeholder="Masukan CAS Number">
+                        placeholder="Masukan Chemical Supplier">
                 </div>
             </div>
 

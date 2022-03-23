@@ -36,7 +36,8 @@ Route::group(['middleware' => ['auth', 'prevent-back-history']], function () {
     Route::post('/removeimagepola', 'PolaController@removeImagePortofolio')->name('pola.removeImage');
     Route::resource('/testimoni', 'TestimoniController');
     Route::resource('/msds', 'MsdsController');
-    Route::post('/removeimagebahan', 'BahanController@removeImageBahan')->name('bahan.removeImage');
+    Route::post('/removepdfmsds', 'MsdsController@removePdfMsds')->name('msds.removePdf');
+    Route::get('/getbyid', 'MsdsController@getbyid')->name('msds.getbyid');
     Route::resource('/departement', 'DepartementController');
     Route::resource('/partner', 'PartnerController');
 });

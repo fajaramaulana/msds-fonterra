@@ -40,6 +40,74 @@
             </table>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" tabindex="-1" role="dialog" style="z-index: 123123 !important; margin-left: 10% !important;" id="toggle-modal">
+        <div class="modal-dialog modal-lg" style="min-width: 900px" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="col-sm-8">
+                        <h5 class="modal-title" id="staticBackdropLabel"></h5>
+                    </div>
+                    <div class="col-sm-3 pull-right">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">x</button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">Chemical Common Name</label>
+                            <p id="chemical_common_name"></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">Chemical Supplier</label>
+                            <p id="chemical_supplier"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">SDS Issue Date</label>
+                            <p id="sds_issue_date"></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">Expired Date</label>
+                            <p id="expired_date"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">CAS Number</label>
+                            <p id="cas_number"></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">Trade Name</label>
+                            <p id="trade_name"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">Location of Chemical</label>
+                            <p id="location_of_chemical"></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">Dokumen</label><br>
+                            <a id="document" class="btn btn-sm btn-primary">Download Dokumen</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal-backdrop {
+            position: unset !important;
+        }
+
+    </style>
 @endsection
 
 @section('script')
@@ -115,14 +183,39 @@
             });
         };
 
+        $('#toggle-modal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var recipient = button.data('throw'); // Extract info from data-* attributes
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('msds.getbyid',) }}',
+                data: {
+                    idlog: recipient,
+                },
+                success: function(data) {
+                    console.log(data)
+                    $('#staticBackdropLabel').html(`MSDS ${data.chemical_common_name}`);
+                    $('#chemical_common_name').html(data.chemical_common_name);
+                    $('#chemical_supplier').html(data.chemical_supplier);
+                    $('#sds_issue_date').html(data.sds_issue_date);
+                    $('#expired_date').html(data.expired_date);
+                    $('#cas_number').html(data.cas_number);
+                    $('#trade_name').html(data.trade_name);
+                    $('#location_of_chemical').html(data.location_of_chemical);
+                    let a = document.getElementById('document');
+                    a.href = "{{ asset('dokumen/') }}"+"/"+data.path_pdf;
+                }
+            })
+        });
+
         $('form').submit(function(event) {
             event.preventDefault();
             let departement_id = $('#departement_id').val();
             let url;
-            
+
             if (departement_id == 0) {
                 url = `{{ route('msds.index') }}`
-            }else{
+            } else {
                 url = `{{ route('msds.index') }}?departement_id=${departement_id}`
             }
             window.location.href = url

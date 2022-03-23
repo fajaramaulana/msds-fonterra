@@ -33,8 +33,7 @@ class MsdsController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-
-                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ', \'' . $row->cas_number . '\')">Edit</button> <button class="btn btn-sm btn-primary" onclick="return detail(' . $row->id . ')">Detail</button>';
+                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ', \'' . $row->cas_number . '\')">Edit</button> <button type="button" class="btn btn-info" data-toggle="modal"  data-target="#toggle-modal" data-throw="'. $row->id.'">Detail</button>';
 
                     return $btn;
                 })
@@ -144,28 +143,44 @@ class MsdsController extends Controller
             DB::commit();
             return [
                 'success' => 1,
-                'message' => "Success Insert Bahan"
+                'message' => "Success Insert MSDS"
             ];
         }
     }
 
-    public function removeImageBahan(Request $request)
+    public function edit($id)
     {
-        $idBahan = $request->id;
-        $bahan = Bahan::where('id', $idBahan)->select('image')->get();
-        $bahanUpdate = Bahan::findOrFail($idBahan);
-        $pathImage = base_path('..\mainData\\') . $bahan[0]['image'];
+        $departements = Departement::select('id', 'name')->orderBy('name', 'desc')->get();
+        $msds = Msds::select('*')->findorfail($id);
+        return view('admin.msds.edit', [
+            "departements" => $departements,
+            "msds" => $msds
+        ]);
+    }
+
+    public function getbyid(Request $request)
+    {
+        $id = $request->get('idlog');
+        $msds = Msds::select('*')->findorfail($id);
+        return response()->json($msds);
+    }
+
+    public function removePdfMsds(Request $request)
+    {
+        $idMsds = $request->id;
+        $msds = Msds::where('id', $idMsds)->select('path_pdf')->get();
+        $msdsUpdate = Msds::findOrFail($idMsds);
+        $pathPdf = public_path('dokumen') . '\\'  . $msds[0]['path_pdf'];
 
         try {
-            @unlink($pathImage);
+            @unlink($pathPdf);
             try {
-                $bahanUpdate->update([
-                    'image' => null,
-                    "status" => 0
+                $msdsUpdate->update([
+                    'path_pdf' => null,
                 ]);
                 return [
                     'success' => 1,
-                    'message' => "Success Remove Image"
+                    'message' => "Success Remove PDF"
                 ];
             } catch (\Throwable $th) {
                 return [
@@ -182,35 +197,36 @@ class MsdsController extends Controller
     }
 
 
-    public function edit($id)
-    {
-        $jasa = Listjasa::select('id', 'name')->where("status", 1)->orderBy('name', 'desc')->get();
-        $bahan = Bahan::select('id', 'id_jasa', 'nama_bahan', 'description', 'image', 'status')->findorfail($id);
-        return view('admin.bahan.edit', [
-            "jasas" => $jasa,
-            "msds" => $bahan
-        ]);
-    }
-
-
-    public function update(Request $request, Bahan $bahan)
+    public function update(Request $request, Msds $bahan)
     {
         $rules = array(
-            'nama_bahan' => 'required|min:5',
-            'description' => 'required|max: 140'
+            'departement_id' => 'required',
+            'chemical_common_name' => 'required',
+            'trade_name' => 'required',
+            'hsno_class' => 'required',
+            'sds_issue_date' => 'required',
+            'un_number' => 'required',
+            'cas_number' => 'required',
+            'chemical_supplier' => 'required',
+            'quantity_volume' => 'required',
+            'concentration' => 'required',
+            'packaging_size' => 'required',
+            'type_of_container' => 'required',
+            'location_of_chemical' => 'required',
+            'bulk_storage_tank' => 'required',
+            'signage_in_place' => 'required',
+            'bund_capacity' => 'required',
+            'bunding_material' => 'required',
+            'comments_other' => 'required',
         );
 
-        if ($request->gambar != null) {
-            $rules['gambar']  = 'mimes:jpeg,jpg,png|required|max:10000|dimensions:max_width=370,max_height=359,min_width=370,min_height=359';
+        if ($request->dokumen != null) {
+            $rules['dokumen']  = 'mimes:pdf,docx,doc,xls,xlsx|required';
         }
 
-        $messages = array(
-            'nama_bahan.required' => 'Nama Bahan is required.',
-            'nama_bahan.min' => 'Nama Bahan min 5 character.',
-            'nama_bahan.max' => 'Nama Bahan max 20 character.',
-        );
+        $validator = Validator::make($request->all(), $rules);
 
-        $validator = Validator::make($request->all(), $rules, $messages);
+
 
         if ($validator->fails()) {
             return [
@@ -218,64 +234,105 @@ class MsdsController extends Controller
                 'message' => $validator->errors()
             ];
         } else {
-            if ($request->id_jasa == 0) {
+            if ($request->departement_id == 0) {
                 return [
                     'success' => 2,
-                    'message' => "Anda Harus Pilih Jasa Terlebih dahulu."
+                    'message' => "Anda Harus Pilih Departement Terlebih dahulu."
                 ];
             }
-
-            $bahanUp = Bahan::findorfail($bahan->id);
-
-            if ($request->has('gambar')) {
-                $gambar = $request->file('gambar');
-                $extension = $request->file('gambar')->guessExtension();
-                $newGambarName = slugify($request->nama_bahan) . "-" . randString(4) . "." . $extension;
+            $dokumen = $request->file('dokumen');
+            if ($dokumen !== null) {
+                $extension = $request->file('dokumen')->guessExtension();
+                $newGambarName = slugify($request->cas_number) . "-" . randString(4) . "." . $extension;
+                $pathImage = public_path('dokumen') . '\\' . $newGambarName;
                 try {
-                    $gambar->move(base_path('..\mainData\bahan'), $newGambarName);
+                    $dokumen->move(public_path('dokumen') . '\\', $newGambarName);
+                    DB::beginTransaction();
+                    try {
+                        $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(365)->format('Y-m-d');
+                        $msdsUpdate = Msds::findOrFail($request->id);
+                        $msdsUpdate->update([
+                            'departement_id' => $request->departement_id,
+                            'chemical_common_name' => $request->chemical_common_name,
+                            'trade_name' => $request->trade_name,
+                            'hsno_class' => $request->hsno_class,
+                            'sds_issue_date' => $request->sds_issue_date,
+                            'expired_date' => $expiredDate,
+                            'un_number' => $request->un_number,
+                            'cas_number' => $request->cas_number,
+                            'chemical_supplier' => $request->chemical_supplier,
+                            'quantity_volume' => $request->quantity_volume,
+                            'concentration' => $request->concentration,
+                            'packaging_size' => $request->packaging_size,
+                            'type_of_container' => $request->type_of_container,
+                            'location_of_chemical' => $request->location_of_chemical,
+                            'bulk_storage_tank' => $request->bulk_storage_tank,
+                            'signage_in_place' => $request->signage_in_place,
+                            'bund_capacity' => $request->bund_capacity,
+                            'bunding_material' => $request->bunding_material,
+                            'comments_other' => $request->comments_other,
+                            'path_pdf' => $newGambarName
+                        ]);
+                    } catch (\Throwable $th) {
+                        unlink($pathImage);
+                        DB::rollback();
+                        return [
+                            'success' => 2,
+                            'message' => "Error on store data to database. \n" . $th->getMessage()
+                        ];
+                    }
                 } catch (\Throwable $th) {
+                    DB::rollback();
+                    unlink($pathImage);
                     return [
                         'success' => 2,
-                        'message' => "Error on store image to Storage. \n" . $th->getMessage()
+                        'message' => "Error on store image to storage. \n" . $th->getMessage()
                     ];
                 }
-
-                $bahan_data = [
-                    'nama_bahan'  => $request->nama_bahan,
-                    'description'  => $request->description,
-                    'id_jasa' => $request->id_jasa,
-                    'image' => 'bahan/' . $newGambarName,
-                    'status' => $request->status,
+                DB::commit();
+                return [
+                    'success' => 1,
+                    'message' => "Success update MSDS"
                 ];
             } else {
-                if ($request->gambar == null && $request->status == 1 && $bahanUp['image'] == "") {
+                DB::beginTransaction();
+                try {
+                    $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(365)->format('Y-m-d');
+                    $msdsUpdate = Msds::findOrFail($request->id);
+                    $msdsUpdate->update([
+                        'departement_id' => $request->departement_id,
+                        'chemical_common_name' => $request->chemical_common_name,
+                        'trade_name' => $request->trade_name,
+                        'hsno_class' => $request->hsno_class,
+                        'sds_issue_date' => $request->sds_issue_date,
+                        'expired_date' => $expiredDate,
+                        'un_number' => $request->un_number,
+                        'cas_number' => $request->cas_number,
+                        'chemical_supplier' => $request->chemical_supplier,
+                        'quantity_volume' => $request->quantity_volume,
+                        'concentration' => $request->concentration,
+                        'packaging_size' => $request->packaging_size,
+                        'type_of_container' => $request->type_of_container,
+                        'location_of_chemical' => $request->location_of_chemical,
+                        'bulk_storage_tank' => $request->bulk_storage_tank,
+                        'signage_in_place' => $request->signage_in_place,
+                        'bund_capacity' => $request->bund_capacity,
+                        'bunding_material' => $request->bunding_material,
+                        'comments_other' => $request->comments_other,
+                    ]);
+                } catch (\Throwable $th) {
+                    DB::rollback();
                     return [
                         'success' => 2,
-                        'message' => "You Need To Upload Image First before you Activate this Jasa."
-                    ];
-                } else {
-                    $bahan_data = [
-                        'nama_bahan'  => $request->nama_bahan,
-                        'description'  => $request->description,
-                        'id_jasa' => $request->id_jasa,
-                        'status' => $request->status,
+                        'message' => "Error on store data to database. \n" . $th->getMessage()
                     ];
                 }
+                DB::commit();
+                return [
+                    'success' => 1,
+                    'message' => "Success update MSDS"
+                ];
             }
-
-            try {
-                $bahanUp->update($bahan_data);
-            } catch (\Throwable $th) {
-                return response()->json([
-                    'success' => 2,
-                    'message' => "Error on store data to database. \n\n" . $th->getMessage()
-                ]);
-            }
-
-            return [
-                'success' => 1,
-                'message' => "Success Update Portofolio"
-            ];
         }
     }
 
