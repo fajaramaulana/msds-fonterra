@@ -10,6 +10,8 @@
     <title>
         FBMI MSDS
     </title>
+    <meta name="Author" content="Fajar Agus Maulana">
+    <meta name="author" content="Fajar Agus Maulana">
     <link rel="stylesheet" type="text/css" href="{{ asset('frontend/frontend/style.css') }}">
     <link rel="stylesheet" href="{{ asset('frontend/css/base.css')}}">
     <link rel="stylesheet" href="{{ asset('frontend/css/vendor.css')}}">
