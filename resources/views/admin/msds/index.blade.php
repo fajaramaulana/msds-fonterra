@@ -50,7 +50,6 @@
                         <h5 class="modal-title" id="staticBackdropLabel"></h5>
                     </div>
                     <div class="col-sm-3 pull-right">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">x</button>
                     </div>
                 </div>
                 <div class="modal-body">

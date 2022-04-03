@@ -101,7 +101,7 @@ class MsdsController extends Controller
                 DB::beginTransaction();
                 try {
                     $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(365)->format('Y-m-d');
-                    Msds::create([
+                    $msds_id = Msds::create([
                         'departement_id' => $request->departement_id,
                         'chemical_common_name' => $request->chemical_common_name,
                         'trade_name' => $request->trade_name,
@@ -123,6 +123,11 @@ class MsdsController extends Controller
                         'comments_other' => $request->comments_other,
                         'path_pdf' => $newGambarName
 
+                    ]);
+
+                    DB::table('table_email_notify')->insert([
+                        'msds_id' => $msds_id->id,
+                        'departement_id' => $request->departement_id,
                     ]);
                 } catch (\Throwable $th) {
                     unlink($pathImage);
