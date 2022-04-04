@@ -1,6 +1,6 @@
 @extends('admin.template-admin.master')
 @section('title', 'MSDS')
-@section('sub-judul', 'List MSDS')
+@section('sub-judul', 'Hazardouse Register')
 @section('content')
     <a href="{{ route('msds.create') }}" class="btn btn-primary btn-sm">Tambah MSDS</a>
     <form method="POST" id="form-search" enctype="multipart/form-data">
@@ -42,7 +42,8 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" tabindex="-1" role="dialog" style="z-index: 123123 !important; margin-left: 10% !important;" id="toggle-modal">
+    <div class="modal fade" tabindex="-1" role="dialog" style="z-index: 123123 !important; margin-left: 10% !important;"
+        id="toggle-modal">
         <div class="modal-dialog modal-lg" style="min-width: 900px" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -159,10 +160,10 @@
 
         });
 
-        function edit(id, title) {
+        function edit(id) {
             swal({
                 title: `Warning`,
-                text: `Apakah anda yakin ingin mengedit MSDS ${title}`,
+                text: `Apakah anda yakin ingin mengedit MSDS`,
                 type: 'warning',
                 buttons: {
                     confirm: {
@@ -187,7 +188,7 @@
             var recipient = button.data('throw'); // Extract info from data-* attributes
             $.ajax({
                 type: 'GET',
-                url: '{{ route('msds.getbyid',) }}',
+                url: '{{ route('msds.getbyid') }}',
                 data: {
                     idlog: recipient,
                 },
@@ -202,7 +203,7 @@
                     $('#trade_name').html(data.trade_name);
                     $('#location_of_chemical').html(data.location_of_chemical);
                     let a = document.getElementById('document');
-                    a.href = "{{ asset('dokumen/') }}"+"/"+data.path_pdf;
+                    a.href = "{{ asset('dokumen/') }}" + "/" + data.path_pdf;
                 }
             })
         });

@@ -24,7 +24,7 @@
                     <label>Chemical Common Name<span style="color:red;">*</span></label>
                     <input type="text" class="form-control" id="chemical_common_name" name="chemical_common_name"
                         placeholder="Masukan Chemical Common Name" value="{{ $msds->chemical_common_name }}">
-                        <input type="hidden" name="id" value="{{$msds->id}}">
+                    <input type="hidden" name="id" value="{{ $msds->id }}">
                 </div>
             </div>
         </div>
@@ -119,7 +119,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Departement<span style="color:red;">*</span></label>
+                    <label>Bulk Storage Tank<span style="color:red;">*</span></label>
                     <select class="form-control " name="bulk_storage_tank" id="bulk_storage_tank">
                         <option value="0" holder>Status</option>
                         <option value="1" {{ $msds->bulk_storage_tank == 1 ? 'selected' : '' }}>Yes</option>
@@ -153,14 +153,15 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Dokumen<span style="color:red;">*</span></label>
+                <label>Dokumen</label>
                 @if ($msds->path_pdf == null)
                     <input type="file" class="form-control" id="dokumen" name="dokumen" onChange="validate(this.value)">
                 @else
                     <div>
                         <a class="btn btn-sm btn-primary" href="{{ asset('dokumen/' . $msds->path_pdf) }}"
                             target="_blank">Download Document Here</a>
-                        <button class="btn btn-sm btn-danger" onclick="event.preventDefault(); removePdf({{ $msds->id }})">Delete Document</button>
+                        <button class="btn btn-sm btn-danger"
+                            onclick="event.preventDefault(); removePdf({{ $msds->id }})">Delete Document</button>
                     </div>
                 @endif
             </div>

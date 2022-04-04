@@ -49,11 +49,11 @@ class WelcomePageController extends Controller
             $findTableEmail = DB::table('table_email_notify')->where('msds_id', $value->id)->first();
             if ($findTableEmail->sevenday == 0) {
                 try {
-                    Mail::to("fajaramaulana.dev@gmail.com")->send(new Reminder($value, "7"));
+                    Mail::to($value->email)->send(new Reminder($value, "7"));
                     DB::table('table_email_notify')->where('id', $findTableEmail->id)->update([
                         'sevenday' => 1,
                     ]);
-                    echo "success";
+                    echo "success 7";
                 } catch (\Throwable $th) {
                     dd($th->getMessage());
                 }   
@@ -64,12 +64,12 @@ class WelcomePageController extends Controller
             $findTableEmail = DB::table('table_email_notify')->where('msds_id', $value->id)->first();
             if ($findTableEmail->sevenday == 1 && $findTableEmail->threeday == 0) {
                 try {
-                    Mail::to("fajaramaulana.dev@gmail.com")->send(new Reminder($value, "3"));
+                    Mail::to($value->email)->send(new Reminder($value, "3"));
                     DB::table('table_email_notify')->where('id', $findTableEmail->id)->update([
                         'sevenday' => 1,
                         'threeday' => 1,
                     ]);
-                    echo "success";
+                    echo "success 3";
                 } catch (\Throwable $th) {
                     dd($th->getMessage());
                 }   
@@ -80,13 +80,13 @@ class WelcomePageController extends Controller
             $findTableEmail = DB::table('table_email_notify')->where('msds_id', $value->id)->first();
             if ($findTableEmail->sevenday == 1 && $findTableEmail->threeday == 1 && $findTableEmail->oneday == 0) {
                 try {
-                    Mail::to("fajaramaulana.dev@gmail.com")->send(new Reminder($value, "1"));
+                    Mail::to($value->email)->send(new Reminder($value, "1"));
                     DB::table('table_email_notify')->where('id', $findTableEmail->id)->update([
                         'sevenday' => 1,
                         'threeday' => 1,
                         'oneday' => 1,
                     ]);
-                    echo "success";
+                    echo "success 1";
                 } catch (\Throwable $th) {
                     dd($th->getMessage());
                 }   

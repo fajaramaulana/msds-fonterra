@@ -115,7 +115,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Departement<span style="color:red;">*</span></label>
+                    <label>Bulk Storage Tank<span style="color:red;">*</span></label>
                     <select class="form-control " name="bulk_storage_tank" id="bulk_storage_tank">
                         <option value="0" holder>Status</option>
                         <option value="1">Yes</option>
@@ -149,11 +149,11 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Dokumen<span style="color:red;">*</span></label>
+                <label>Dokumen</label>
                 <input type="file" class="form-control" id="dokumen" name="dokumen" onChange="validate(this.value)">
             </div>
         </div>
-        
+
         <div class="form-group">
             <label>Comments/Other<span style="color:red;">*</span></label>
             <textarea class="form-control" name="comments_other" id="comments_other" cols="30" rows="10"></textarea>

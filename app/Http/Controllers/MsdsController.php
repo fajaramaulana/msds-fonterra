@@ -25,7 +25,7 @@ class MsdsController extends Controller
         $reqId = $request->get('departement_id');
         $departements = Departement::select('id', 'name')->orderBy('name', 'desc')->get();
         if ($request->ajax()) {
-            $data = Msds::join('departements', 'Msds.departement_id', '=', 'departements.id')
+            $data = Msds::join('departements', 'msds.departement_id', '=', 'departements.id')
                 ->select('departements.name', 'msds.id', 'msds.chemical_common_name', 'msds.sds_issue_date', 'msds.expired_date', 'msds.chemical_supplier', 'msds.cas_number');
             if ($request->get('departement_id') || $request->get('departement_id') == '0') {
                 $data = $data->where('departement_id', $request->get('departement_id'));
@@ -33,7 +33,7 @@ class MsdsController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ', \'' . $row->cas_number . '\')">Edit</button> <button type="button" class="btn btn-info" data-toggle="modal"  data-target="#toggle-modal" data-throw="'. $row->id.'">Detail</button>';
+                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ')">Edit</button> <button type="button" class="btn btn-info" data-toggle="modal"  data-target="#toggle-modal" data-throw="' . $row->id . '">Detail</button>';
 
                     return $btn;
                 })
@@ -75,8 +75,11 @@ class MsdsController extends Controller
             'bund_capacity' => 'required',
             'bunding_material' => 'required',
             'comments_other' => 'required',
-            'dokumen' => 'mimes:pdf,docx,doc,xls,xlsx|required'
         );
+
+        if ($request->dokumen != null) {
+            $rules['dokumen']  = 'mimes:pdf,docx,doc,xls,xlsx|required';
+        }
 
         $validator = Validator::make($request->all(), $rules);
 
@@ -93,14 +96,19 @@ class MsdsController extends Controller
                 ];
             }
             $dokumen = $request->file('dokumen');
-            $extension = $request->file('dokumen')->guessExtension();
-            $newGambarName = slugify($request->cas_number) . "-" . randString(4) . "." . $extension;
-            $pathImage = public_path('dokumen') . '\\' . $newGambarName;
+            if ($dokumen !== null) {
+                $extension = $request->file('dokumen')->guessExtension();
+                $newGambarName = slugify($request->cas_number) . "-" . randString(4) . "." . $extension;
+                $pathImage = public_path('dokumen') . '\\' . $newGambarName;
+            }
+
             try {
-                $dokumen->move(public_path('dokumen') . '\\', $newGambarName);
+                if ($dokumen !== null) {
+                    $dokumen->move(public_path('dokumen') . '\\', $newGambarName);
+                }
                 DB::beginTransaction();
                 try {
-                    $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(365)->format('Y-m-d');
+                    $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(1825)->format('Y-m-d');
                     $msds_id = Msds::create([
                         'departement_id' => $request->departement_id,
                         'chemical_common_name' => $request->chemical_common_name,
@@ -121,7 +129,7 @@ class MsdsController extends Controller
                         'bund_capacity' => $request->bund_capacity,
                         'bunding_material' => $request->bunding_material,
                         'comments_other' => $request->comments_other,
-                        'path_pdf' => $newGambarName
+                        'path_pdf' => ($dokumen == null ? null : $newGambarName)
 
                     ]);
 
@@ -130,7 +138,7 @@ class MsdsController extends Controller
                         'departement_id' => $request->departement_id,
                     ]);
                 } catch (\Throwable $th) {
-                    unlink($pathImage);
+                    @unlink($pathImage);
                     DB::rollback();
                     return [
                         'success' => 2,
@@ -139,7 +147,7 @@ class MsdsController extends Controller
                 }
             } catch (\Throwable $th) {
                 DB::rollback();
-                unlink($pathImage);
+                @unlink($pathImage);
                 return [
                     'success' => 2,
                     'message' => "Error on store image to storage. \n" . $th->getMessage()
@@ -254,7 +262,7 @@ class MsdsController extends Controller
                     $dokumen->move(public_path('dokumen') . '\\', $newGambarName);
                     DB::beginTransaction();
                     try {
-                        $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(365)->format('Y-m-d');
+                        $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(1825)->format('Y-m-d');
                         $msdsUpdate = Msds::findOrFail($request->id);
                         $msdsUpdate->update([
                             'departement_id' => $request->departement_id,
@@ -302,7 +310,7 @@ class MsdsController extends Controller
             } else {
                 DB::beginTransaction();
                 try {
-                    $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(365)->format('Y-m-d');
+                    $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(1825)->format('Y-m-d');
                     $msdsUpdate = Msds::findOrFail($request->id);
                     $msdsUpdate->update([
                         'departement_id' => $request->departement_id,
