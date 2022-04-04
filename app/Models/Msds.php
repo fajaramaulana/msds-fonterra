@@ -26,6 +26,7 @@ class Msds extends Model
         'bund_capacity',
         'bunding_material',
         'comments_other',
-        'path_pdf'
+        'path_pdf',
+        'active_status'
     ];
 }

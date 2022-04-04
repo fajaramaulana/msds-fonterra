@@ -26,14 +26,14 @@ class MsdsController extends Controller
         $departements = Departement::select('id', 'name')->orderBy('name', 'desc')->get();
         if ($request->ajax()) {
             $data = Msds::join('departements', 'msds.departement_id', '=', 'departements.id')
-                ->select('departements.name', 'msds.id', 'msds.chemical_common_name', 'msds.sds_issue_date', 'msds.expired_date', 'msds.chemical_supplier', 'msds.cas_number');
+                ->select('departements.name', 'msds.id', 'msds.chemical_common_name', 'msds.sds_issue_date', 'msds.expired_date', 'msds.chemical_supplier', 'msds.cas_number')->where('active_status', 1)->orderBy('msds.id', 'desc');
             if ($request->get('departement_id') || $request->get('departement_id') == '0') {
                 $data = $data->where('departement_id', $request->get('departement_id'));
             }
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<button class="btn btn-sm btn-primary" onclick="return edit(' . $row->id . ')">Edit</button> <button type="button" class="btn btn-info" data-toggle="modal"  data-target="#toggle-modal" data-throw="' . $row->id . '">Detail</button>';
+                    $btn = '<button class="btn btn-sm btn-warning" onclick="return edit(' . $row->id . ')" title="Edit"><i class="fas fa-pencil-alt"></i></button> <button class="btn btn-sm btn-danger" onclick="return hapus(' . $row->id . ')" title="Delete"><i class="fas fa-trash-alt"></i></button> <button type="button" style="margin-top: 5px;" class="btn btn-info btn-sm" data-toggle="modal"  data-target="#toggle-modal" title="Detail" data-throw="' . $row->id . '"><i class="fas fa-eye"></i></button>';
 
                     return $btn;
                 })
@@ -129,8 +129,8 @@ class MsdsController extends Controller
                         'bund_capacity' => $request->bund_capacity,
                         'bunding_material' => $request->bunding_material,
                         'comments_other' => $request->comments_other,
-                        'path_pdf' => ($dokumen == null ? null : $newGambarName)
-
+                        'path_pdf' => ($dokumen == null ? null : $newGambarName),
+                        'active_status' => 1,
                     ]);
 
                     DB::table('table_email_notify')->insert([
@@ -284,7 +284,8 @@ class MsdsController extends Controller
                             'bund_capacity' => $request->bund_capacity,
                             'bunding_material' => $request->bunding_material,
                             'comments_other' => $request->comments_other,
-                            'path_pdf' => $newGambarName
+                            'path_pdf' => $newGambarName,
+                            'active_status' => 1,
                         ]);
                     } catch (\Throwable $th) {
                         unlink($pathImage);
@@ -352,5 +353,24 @@ class MsdsController extends Controller
 
     public function destroy($id)
     {
+    }
+
+    public function inactive(Request $request)
+    {
+        $msds = Msds::findOrFail($request->id);
+        try {
+            $msds->update([
+                'active_status' => 0
+            ]);
+        } catch (\Throwable $th) {
+            return [
+                'success' => 2,
+                'message' => "Error on store data to database. \n" . $th->getMessage()
+            ];
+        }
+        return [
+            'success' => 1,
+            'message' => "Success inactive MSDS"
+        ];
     }
 }

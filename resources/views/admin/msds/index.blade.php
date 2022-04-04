@@ -152,6 +152,7 @@
                     {
                         data: 'action',
                         name: 'action',
+                        width: '10%',
                         orderable: false,
                         searchable: false
                     },
@@ -183,6 +184,71 @@
             });
         };
 
+        function hapus(id) {
+            swal({
+                title: `Warning`,
+                text: `Apakah anda yakin ingin mengahpus MSDS ini?`,
+                type: 'warning',
+                buttons: {
+                    confirm: {
+                        text: 'Ya',
+                        className: 'btn btn-success'
+                    },
+                    cancel: {
+                        visible: true,
+                        className: 'btn btn-danger'
+                    }
+                }
+            }).then((result) => {
+                if (result == true) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ route('msds.inactive') }}',
+                        data: {
+                            id: id,
+                        },
+                        success: function(result) {
+                            if (result.success == 1) {
+                                swal({
+                                    title: "Good Job",
+                                    text: result.message,
+                                    timer: 10000,
+                                    button: false,
+                                    type: "success",
+                                    icon: 'success'
+                                }).then(() => {
+                                    window.location.href = "{{ url('/msds') }}";
+                                })
+                            } else if (result.success == 2) {
+                                swal({
+                                    title: "Pesan Eror",
+                                    text: result.message,
+                                    timer: 10000,
+                                    button: false,
+                                    type: "error",
+                                    icon: 'error'
+                                })
+                            } else {
+                                var values = '';
+                                jQuery.each(result.message, function(key, value) {
+                                    values += `\n ${value}`
+                                });
+
+                                swal({
+                                    title: "Error Validation",
+                                    text: values,
+                                    timer: 10000,
+                                    button: false,
+                                    type: "error",
+                                    icon: 'error'
+                                })
+                            }
+                        }
+                    })
+                }
+            });
+        };
+
         $('#toggle-modal').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             var recipient = button.data('throw'); // Extract info from data-* attributes
@@ -193,7 +259,6 @@
                     idlog: recipient,
                 },
                 success: function(data) {
-                    console.log(data)
                     $('#staticBackdropLabel').html(`MSDS ${data.chemical_common_name}`);
                     $('#chemical_common_name').html(data.chemical_common_name);
                     $('#chemical_supplier').html(data.chemical_supplier);
@@ -203,7 +268,14 @@
                     $('#trade_name').html(data.trade_name);
                     $('#location_of_chemical').html(data.location_of_chemical);
                     let a = document.getElementById('document');
-                    a.href = "{{ asset('dokumen/') }}" + "/" + data.path_pdf;
+                    if (data.path_pdf == null) {
+                        a.href = '#';
+                        a.innerHTML = 'Tidak Ada Dokumen';
+                        a.setAttribute('readonly', 'readonly');
+                    } else {
+                        a.href = `{{ asset('storage/msds') }}/${data.path_pdf}`;
+                        a.innerHTML = 'Download Dokumen';
+                    }
                 }
             })
         });
