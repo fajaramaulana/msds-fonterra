@@ -26,7 +26,7 @@ class MsdsController extends Controller
         $departements = Departement::select('id', 'name')->orderBy('name', 'desc')->get();
         if ($request->ajax()) {
             $data = Msds::join('departements', 'msds.departement_id', '=', 'departements.id')
-                ->select('departements.name', 'msds.id', 'msds.chemical_common_name', 'msds.sds_issue_date', 'msds.expired_date', 'msds.chemical_supplier', 'msds.cas_number')->where('active_status', 1)->orderBy('msds.id', 'desc');
+                ->select('departements.name', 'msds.id', 'msds.chemical_common_name', 'msds.sds_issue_date', 'msds.expired_date', 'msds.chemical_supplier', 'msds.cas_number', 'msds.created_at')->where('active_status', 1);
             if ($request->get('departement_id') || $request->get('departement_id') == '0') {
                 $data = $data->where('departement_id', $request->get('departement_id'));
             }

@@ -32,6 +32,7 @@
                         <th>SDS Issue Date</th>
                         <th>Exipred Date</th>
                         <th>Checmical Supplier</th>
+                        <th>Created At</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -125,6 +126,7 @@
                         departement_id: departement_id,
                     }
                 },
+                order : [[6, 'desc']],
                 columns: [{
                         data: 'cas_number',
                         name: 'cas_number'
@@ -147,7 +149,12 @@
                     },
                     {
                         data: 'chemical_supplier',
-                        name: 'chemical_supplier'
+                        name: 'chemical_supplier',
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
+                        visible: false
                     },
                     {
                         data: 'action',
