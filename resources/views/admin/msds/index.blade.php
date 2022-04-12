@@ -92,7 +92,7 @@
                         </div>
                         <div class="col-sm-6">
                             <label style="font-weight: 800">Dokumen</label><br>
-                            <a id="document" class="btn btn-sm btn-primary">Download Dokumen</a>
+                            <a id="document" target="_blank" class="btn btn-sm btn-primary">Download Dokumen</a>
                         </div>
                     </div>
                 </div>
