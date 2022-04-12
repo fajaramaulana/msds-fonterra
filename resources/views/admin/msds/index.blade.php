@@ -280,7 +280,7 @@
                         a.innerHTML = 'Tidak Ada Dokumen';
                         a.setAttribute('readonly', 'readonly');
                     } else {
-                        a.href = `{{ asset('storage/msds') }}/${data.path_pdf}`;
+                        a.href = `{{ asset('dokumen') }}/${data.path_pdf}`;
                         a.innerHTML = 'Download Dokumen';
                     }
                 }
