@@ -95,6 +95,12 @@
                             <a id="document" target="_blank" class="btn btn-sm btn-primary">Download Dokumen</a>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label style="font-weight: 800">Signage Document</label><br>
+                            <a id="signage" target="_blank" class="btn btn-sm btn-primary">Download Signage Dokumen</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -282,6 +288,16 @@
                     } else {
                         a.href = `{{ asset('dokumen') }}/${data.path_pdf}`;
                         a.innerHTML = 'Download Dokumen';
+                    }
+
+                    let b = document.getElementById('signage');
+                    if (data.signage_doc == null) {
+                        b.href = '#';
+                        b.innerHTML = 'Tidak Ada Signage Dokumen';
+                        b.setAttribute('readonly', 'readonly');
+                    } else {
+                        b.href = `{{ asset('dokumen') }}/${data.signage_doc}`;
+                        b.innerHTML = 'Download Signage Dokumen';
                     }
                 }
             })

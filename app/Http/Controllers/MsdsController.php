@@ -26,7 +26,7 @@ class MsdsController extends Controller
         $departements = Departement::select('id', 'name')->orderBy('name', 'desc')->get();
         if ($request->ajax()) {
             $data = Msds::join('departements', 'msds.departement_id', '=', 'departements.id')
-                ->select('departements.name', 'msds.id', 'msds.chemical_common_name', 'msds.sds_issue_date', 'msds.expired_date', 'msds.chemical_supplier', 'msds.cas_number', 'msds.created_at')->where('active_status', 1);
+                ->select('departements.name', 'msds.id', 'msds.signage_doc', 'msds.chemical_common_name', 'msds.sds_issue_date', 'msds.expired_date', 'msds.chemical_supplier', 'msds.cas_number', 'msds.created_at')->where('active_status', 1);
             if ($request->get('departement_id') || $request->get('departement_id') == '0') {
                 $data = $data->where('departement_id', $request->get('departement_id'));
             }
@@ -74,12 +74,16 @@ class MsdsController extends Controller
             'signage_in_place' => 'required',
             'bund_capacity' => 'required',
             'bunding_material' => 'required',
-            'comments_other' => 'required',
         );
 
         if ($request->dokumen != null) {
             $rules['dokumen']  = 'mimes:pdf,docx,doc,xls,xlsx|required';
         }
+
+        if ($request->signage_doc != null) {
+            $rules['dokumen']  = 'mimes:pdf,docx,doc,xls,xlsx';
+        }
+
 
         $validator = Validator::make($request->all(), $rules);
 
@@ -102,10 +106,22 @@ class MsdsController extends Controller
                 $pathImage = public_path('dokumen') . '\\' . $newGambarName;
             }
 
+            $signageDoc = $request->file('signage_doc');
+            if ($signageDoc !== null) {
+                $extensionDoc = $request->file('signage_doc')->guessExtension();
+                $newSignageDoc = slugify($request->cas_number) . "-" . randString(4) . "." . $extensionDoc;
+                $pathSignage = public_path('dokumen') . '\\' . $newSignageDoc;
+            }
+
             try {
                 if ($dokumen !== null) {
                     $dokumen->move(public_path('dokumen') . '\\', $newGambarName);
                 }
+
+                if ($signageDoc !== null) {
+                    $signageDoc->move(public_path('dokumen') . '\\', $newSignageDoc);
+                }
+
                 DB::beginTransaction();
                 try {
                     $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(1825)->format('Y-m-d');
@@ -130,6 +146,7 @@ class MsdsController extends Controller
                         'bunding_material' => $request->bunding_material,
                         'comments_other' => $request->comments_other,
                         'path_pdf' => ($dokumen == null ? null : $newGambarName),
+                        'signage_doc' => ($signageDoc == null ? null : $newSignageDoc),
                         'active_status' => 1,
                     ]);
 
@@ -139,6 +156,7 @@ class MsdsController extends Controller
                     ]);
                 } catch (\Throwable $th) {
                     @unlink($pathImage);
+                    @unlink($pathSignage);
                     DB::rollback();
                     return [
                         'success' => 2,
@@ -148,6 +166,7 @@ class MsdsController extends Controller
             } catch (\Throwable $th) {
                 DB::rollback();
                 @unlink($pathImage);
+                @unlink($pathSignage);
                 return [
                     'success' => 2,
                     'message' => "Error on store image to storage. \n" . $th->getMessage()
@@ -209,6 +228,37 @@ class MsdsController extends Controller
         }
     }
 
+    public function removeSignagePdfMsds(Request $request)
+    {
+        $idMsds = $request->id;
+        $msds = Msds::where('id', $idMsds)->select('signage_doc')->get();
+        $msdsUpdate = Msds::findOrFail($idMsds);
+        $pathPdf = public_path('dokumen') . '\\'  . $msds[0]['signage_doc'];
+
+        try {
+            @unlink($pathPdf);
+            try {
+                $msdsUpdate->update([
+                    'signage_doc' => null,
+                ]);
+                return [
+                    'success' => 1,
+                    'message' => "Success Remove Signage Doc"
+                ];
+            } catch (\Throwable $th) {
+                return [
+                    'success' => 0,
+                    'message' => "Error On Deleting Data On Database. " . $th->getMessage()
+                ];
+            }
+        } catch (\Throwable $th) {
+            return [
+                'success' => 0,
+                'message' => "Error On Deleting File On Storage! " . $th->getMessage()
+            ];
+        }
+    }
+
 
     public function update(Request $request, Msds $bahan)
     {
@@ -229,12 +279,15 @@ class MsdsController extends Controller
             'bulk_storage_tank' => 'required',
             'signage_in_place' => 'required',
             'bund_capacity' => 'required',
-            'bunding_material' => 'required',
-            'comments_other' => 'required',
+            'bunding_material' => 'required'
         );
 
         if ($request->dokumen != null) {
             $rules['dokumen']  = 'mimes:pdf,docx,doc,xls,xlsx|required';
+        }
+
+        if ($request->signage_doc != null) {
+            $rules['dokumen']  = 'mimes:pdf,docx,doc,xls,xlsx';
         }
 
         $validator = Validator::make($request->all(), $rules);
@@ -254,12 +307,25 @@ class MsdsController extends Controller
                 ];
             }
             $dokumen = $request->file('dokumen');
+            $signageDoc = $request->file('signage_doc');
             if ($dokumen !== null) {
                 $extension = $request->file('dokumen')->guessExtension();
                 $newGambarName = slugify($request->cas_number) . "-" . randString(4) . "." . $extension;
                 $pathImage = public_path('dokumen') . '\\' . $newGambarName;
+
+                if ($signageDoc !== null) {
+                    $extensionDoc = $request->file('signage_doc')->guessExtension();
+                    $newSignageDoc = slugify($request->cas_number) . "-" . randString(4) . "." . $extensionDoc;
+                    $pathSignage = public_path('dokumen') . '\\' . $newSignageDoc;
+                } else {
+                    $newSignageDoc = $request->signage_doc_existing;
+                }
+
                 try {
                     $dokumen->move(public_path('dokumen') . '\\', $newGambarName);
+                    if ($signageDoc !== null) {
+                        $signageDoc->move(public_path('dokumen') . '\\', $newSignageDoc);
+                    }
                     DB::beginTransaction();
                     try {
                         $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(1825)->format('Y-m-d');
@@ -285,10 +351,12 @@ class MsdsController extends Controller
                             'bunding_material' => $request->bunding_material,
                             'comments_other' => $request->comments_other,
                             'path_pdf' => $newGambarName,
+                            'signage_doc' => $newSignageDoc,
                             'active_status' => 1,
                         ]);
                     } catch (\Throwable $th) {
                         unlink($pathImage);
+                        unlink($pathSignage);
                         DB::rollback();
                         return [
                             'success' => 2,
@@ -298,6 +366,7 @@ class MsdsController extends Controller
                 } catch (\Throwable $th) {
                     DB::rollback();
                     unlink($pathImage);
+                    unlink($pathSignage);
                     return [
                         'success' => 2,
                         'message' => "Error on store image to storage. \n" . $th->getMessage()
@@ -310,7 +379,18 @@ class MsdsController extends Controller
                 ];
             } else {
                 DB::beginTransaction();
+                if ($signageDoc !== null) {
+                    $extensionDoc = $request->file('signage_doc')->guessExtension();
+                    $newSignageDoc = slugify($request->cas_number) . "-" . randString(4) . "." . $extensionDoc;
+                    $pathSignage = public_path('dokumen') . '\\' . $newSignageDoc;
+                } else {
+                    $newSignageDoc = $request->signage_doc_existing;
+                }
+
                 try {
+                    if ($signageDoc !== null) {
+                        $signageDoc->move(public_path('dokumen') . '\\', $newSignageDoc);
+                    }
                     $expiredDate = Carbon::parse($request->sds_issue_date)->addDays(1825)->format('Y-m-d');
                     $msdsUpdate = Msds::findOrFail($request->id);
                     $msdsUpdate->update([
@@ -333,9 +413,11 @@ class MsdsController extends Controller
                         'bund_capacity' => $request->bund_capacity,
                         'bunding_material' => $request->bunding_material,
                         'comments_other' => $request->comments_other,
+                        'signage_doc' => $newSignageDoc,
                     ]);
                 } catch (\Throwable $th) {
                     DB::rollback();
+                    unlink($pathSignage);
                     return [
                         'success' => 2,
                         'message' => "Error on store data to database. \n" . $th->getMessage()

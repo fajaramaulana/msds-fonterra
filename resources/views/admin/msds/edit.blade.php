@@ -80,7 +80,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Quantity Volume<span style="color:red;">*</span></label>
+                    <label>Quantity Volume / Liter<span style="color:red;">*</span></label>
                     <input type="text" class="form-control" id="quantity_volume" name="quantity_volume"
                         placeholder="Masukan Quantity Volume" value="{{ $msds->quantity_volume }}">
                 </div>
@@ -104,8 +104,14 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Type of Container<span style="color:red;">*</span></label>
-                    <input type="text" class="form-control" id="type_of_container" name="type_of_container"
-                        placeholder="Masukan Type of Container" value="{{ $msds->type_of_container }}">
+                    <select class="form-control " name="type_of_container" id="type_of_container">
+                        <option value="0" holder>Type of Container</option>
+                        <option value="jerigen" {{ $msds->type_of_container == "jerigen" ? "selected" : "" }}>Jerigen</option>
+                        <option value="plastik" {{ $msds->type_of_container == "plastik" ? "selected" : "" }}>Plastik</option>
+                        <option value="karung" {{ $msds->type_of_container == "karung" ? "selected" : "" }}>Karung</option>
+                        <option value="drum" {{ $msds->type_of_container == "drum" ? "selected" : "" }}>Drum</option>
+                        <option value="botol" {{ $msds->type_of_container == "botol" ? "selected" : "" }}>Botol</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -166,11 +172,32 @@
                 @endif
             </div>
         </div>
-
-        <div class="form-group">
-            <label>Comments/Other<span style="color:red;">*</span></label>
-            <textarea class="form-control" name="comments_other" id="comments_other" cols="30"
-                rows="10">{{ $msds->comments_other }}</textarea>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Comments/Other</label>
+                    <textarea class="form-control" name="comments_other" id="comments_other" cols="30"
+                        rows="10">{{ $msds->comments_other }}</textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Signage Document</label>
+                    @if ($msds->signage_doc == null)
+                    <input type="file" class="form-control" id="signage_doc" name="signage_doc"
+                    onChange="validate(this.value)">
+                    @else
+                    <div>
+                        <a class="btn btn-sm btn-primary" href="{{ asset('dokumen/' . $msds->signage_doc) }}"
+                            target="_blank">Download Signage Document Here</a>
+                        <button class="btn btn-sm btn-danger"
+                            onclick="event.preventDefault(); removeSignagePdf({{ $msds->id }})">Delete Signage Document</button>
+                            <input type="hidden" name="signage_doc_existing" value="{{ $msds->signage_doc }}">
+                    </div>  
+                    @endif
+                    
+                </div>
+            </div>
         </div>
         <div class="spinner-border"></div>
         <div class="form-group">
@@ -224,8 +251,70 @@ Hazardous</button>
                                     allowOutsideClick: false,
                                     icon: 'success'
                                 }).then(() => {
-                                    window.location.href =
-                                        "{{ url('/bahan') }}";
+                                    location.reload();
+                                })
+                            } else {
+                                swal({
+                                    title: "Pesan Eror",
+                                    text: result.message,
+                                    timer: 10000,
+                                    showConfirmButton: false,
+                                    icon: 'error'
+                                })
+                            }
+                        },
+                        error: function(data) {
+                            $("#preloder").hide();
+                            swal('Error', `${data}`, 'warning');
+                        }
+                    });
+                }
+            });
+        }
+
+        removeSignagePdf = (id) => {
+            var formDataRemove = new FormData();
+            formDataRemove.append('id', id);
+            swal({
+                title: `Warning`,
+                text: `Apakah anda yakin ingin menghapus Signage Dokumen ini? Sekali anda menghapus anda tidak akan bisa melakukan restore terhadap data tersebut.`,
+                type: 'warning',
+                buttons: {
+                    confirm: {
+                        text: 'Ya',
+                        className: 'btn btn-success'
+                    },
+                    cancel: {
+                        visible: true,
+                        className: 'btn btn-danger'
+                    }
+                }
+            }).then((result) => {
+                if (result == true) {
+                    $.ajax({
+                        url: '{{ route('msds.removeSignagePdf') }}',
+                        type: 'POST',
+                        data: formDataRemove,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function() {
+                            $("#preloder").fadeIn();
+                        },
+                        complete: function() {
+                            $("#preloder").hide();
+                        },
+                        success: function(result) {
+                            $("#preloder").hide();
+                            if (result.success == 1) {
+                                swal({
+                                    title: "Good Job",
+                                    text: result.message,
+                                    timer: 5000,
+                                    showConfirmButton: true,
+                                    allowOutsideClick: false,
+                                    icon: 'success'
+                                }).then(() => {
+                                   location.reload();
                                 })
                             } else {
                                 swal({

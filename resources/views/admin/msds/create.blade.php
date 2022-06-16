@@ -76,7 +76,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Quantity Volume<span style="color:red;">*</span></label>
+                    <label>Quantity Volume / Liter<span style="color:red;">*</span></label>
                     <input type="text" class="form-control" id="quantity_volume" name="quantity_volume"
                         placeholder="Masukan Quantity Volume">
                 </div>
@@ -100,8 +100,14 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Type of Container<span style="color:red;">*</span></label>
-                    <input type="text" class="form-control" id="type_of_container" name="type_of_container"
-                        placeholder="Masukan Type of Container">
+                    <select class="form-control " name="type_of_container" id="type_of_container">
+                        <option value="0" holder>Type of Container</option>
+                        <option value="jerigen">Jerigen</option>
+                        <option value="plastik">Plastik</option>
+                        <option value="karung">Karung</option>
+                        <option value="drum">Drum</option>
+                        <option value="botol">Botol</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -148,20 +154,35 @@
                         placeholder="Masukan Bunding Material">
                 </div>
             </div>
-            <div class="form-group">
-                <label>Dokumen</label>
-                <input type="file" class="form-control" id="dokumen" name="dokumen" onChange="validate(this.value)">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Dokumen</label>
+                    <input type="file" class="form-control" id="dokumen" name="dokumen"
+                        onChange="validate(this.value)">
+                </div>
             </div>
         </div>
 
-        <div class="form-group">
-            <label>Comments/Other<span style="color:red;">*</span></label>
-            <textarea class="form-control" name="comments_other" id="comments_other" cols="30" rows="10"></textarea>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Comments/Other</label>
+                    <textarea class="form-control" name="comments_other" id="comments_other" cols="30" rows="10"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Signage</label>
+                    <input type="file" class="form-control" id="signage_doc" name="signage_doc"
+                        onChange="validate(this.value)">
+                </div>
+            </div>
         </div>
+
         <div class="spinner-border"></div>
         <div class="form-group">
-            <button class="btn btn-primary btn-block">Simpan 
-Hazardous</button>
+            <button class="btn btn-primary btn-block">Simpan
+                Hazardous</button>
         </div>
     </form>
     <script src="{{ asset('assets/modules/sweetalert/sweetalert.min.js') }}"></script>

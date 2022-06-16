@@ -27,6 +27,7 @@ class Msds extends Model
         'bunding_material',
         'comments_other',
         'path_pdf',
+        'signage_doc',
         'active_status'
     ];
 }
