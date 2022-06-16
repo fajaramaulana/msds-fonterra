@@ -153,7 +153,7 @@
                 <input type="file" class="form-control" id="dokumen" name="dokumen" onChange="validate(this.value)">
             </div>
         </div>
-        
+
         <div class="form-group">
             <label>Comments/Other<span style="color:red;">*</span></label>
             <textarea class="form-control" name="comments_other" id="comments_other" cols="30" rows="10"></textarea>

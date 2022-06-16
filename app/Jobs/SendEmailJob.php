@@ -34,6 +34,6 @@ class SendEmailJob implements ShouldQueue
     public function handle()
     {
         $email = new Reminder($this->details, $this->day);
-        Mail::to("fajaramaulana.dev@gmail.com")->send($email);
+        // Mail::to("fajaramaulana.dev@gmail.com")->send($email);
     }
 }

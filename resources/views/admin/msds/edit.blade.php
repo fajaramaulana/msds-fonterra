@@ -24,7 +24,7 @@
                     <label>Chemical Common Name<span style="color:red;">*</span></label>
                     <input type="text" class="form-control" id="chemical_common_name" name="chemical_common_name"
                         placeholder="Masukan Chemical Common Name" value="{{ $msds->chemical_common_name }}">
-                        <input type="hidden" name="id" value="{{$msds->id}}">
+                    <input type="hidden" name="id" value="{{ $msds->id }}">
                 </div>
             </div>
         </div>
@@ -160,7 +160,8 @@
                     <div>
                         <a class="btn btn-sm btn-primary" href="{{ asset('dokumen/' . $msds->path_pdf) }}"
                             target="_blank">Download Document Here</a>
-                        <button class="btn btn-sm btn-danger" onclick="event.preventDefault(); removePdf({{ $msds->id }})">Delete Document</button>
+                        <button class="btn btn-sm btn-danger"
+                            onclick="event.preventDefault(); removePdf({{ $msds->id }})">Delete Document</button>
                     </div>
                 @endif
             </div>
