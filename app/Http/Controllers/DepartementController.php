@@ -41,13 +41,13 @@ class DepartementController extends Controller
     public function store(Request $request)
     {
         $rules = array(
-            'name' => 'required|min:5',
+            'name' => 'required|min:3',
             'email' => 'required|regex:/^.+@.+$/i',
         );
 
         $messages = array(
             'name.required' => 'Nama Departement is required.',
-            'name.min' => 'Nama Departement min 5 character.',
+            'name.min' => 'Nama Departement min 3 character.',
             'email.required' => 'Email is required.',
             'email.regex' => 'Bukan Format Email.',
         );
@@ -92,13 +92,13 @@ class DepartementController extends Controller
     public function update(Request $request, $id)
     {
         $rules = array(
-            'name' => 'required|min:5',
+            'name' => 'required|min:3',
             'email' => 'required|regex:/^.+@.+$/i',
         );
 
         $messages = array(
             'name.required' => 'Nama Departement is required.',
-            'name.min' => 'Nama Departement min 5 character.',
+            'name.min' => 'Nama Departement min 3 character.',
             'email.required' => 'Email is required.',
             'email.regex' => 'Bukan Format Email.',
         );

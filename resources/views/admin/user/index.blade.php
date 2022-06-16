@@ -7,7 +7,9 @@
             {{ Session('success') }}
         </div>
     @endif
-    <a href="{{ route('user.create') }}" class="btn btn-primary btn-sm">Tambah User</a>
+    @if (Auth::user()->id == 1)
+        <a href="{{ route('user.create') }}" class="btn btn-primary btn-sm">Tambah User</a>
+    @endif
     <br>
     <br>
     <div class="container">
@@ -19,7 +21,9 @@
                         <th>Nama</th>
                         <th>Email</th>
                         <th>Departemen</th>
-                        <th>Action</th>
+                        @if (Auth::user()->id == 1)
+                            <th>Action</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -29,14 +33,18 @@
                             <td>{{ $hasil->name }}</td>
                             <td>{{ $hasil->email }}</td>
                             <td>{{ $hasil->departement->name }}</td>
-                            <td>
-                                <form action="{{ route('user.destroy', $hasil->id) }}" method="post" id="deleteButton">
-                                    @method('DELETE')
-                                    @csrf
-                                    <a href="{{ route('user.edit', $hasil->id) }}" class="btn btn-primary btn-sm">Edit</a>
-                                    <button class="btn btn-sm btn-danger" type="submit" value="Delete">Delete</button>
-                                </form>
-                            </td>
+                            @if (Auth::user()->id == 1)
+                                <td>
+                                    <form action="{{ route('user.destroy', $hasil->id) }}" method="post"
+                                        id="deleteButton">
+                                        @method('DELETE')
+                                        @csrf
+                                        <a href="{{ route('user.edit', $hasil->id) }}"
+                                            class="btn btn-primary btn-sm">Edit</a>
+                                        <button class="btn btn-sm btn-danger" type="submit" value="Delete">Delete</button>
+                                    </form>
+                                </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>

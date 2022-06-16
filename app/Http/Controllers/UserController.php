@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 use App\Models\Departement;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -33,6 +34,9 @@ class UserController extends Controller
      */
     public function create()
     {
+        if(Auth::user()->id !== 1){
+            return redirect()->route('user.index');
+        }
         $departement = Departement::all();
         return view('admin.user.create', compact('departement'));
     }
@@ -81,6 +85,9 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        if(Auth::user()->id !== 1){
+            return redirect()->route('user.index');
+        }
         $departements = Departement::all();
         $user = User::find($id);
         return view('admin.user.edit', compact('user', 'departements'));

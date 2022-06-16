@@ -56,8 +56,8 @@
                 <td colspan="2" style="font-size:14px;padding:50px 15px 0 15px;">
                     <strong style="display:block;margin:0 0 10px 0;">Regards</strong> Admin MSDS<br> PT Fonterra Brands
                     Manufacturing Indonesia<br> Kawasan Terpadu Indonesia China<br><br>
-                    <b>Mobile Phone:</b> 0877 7547 5332<br>
-                    <b>Email:</b> juni.sara@fonterra.com
+                    <b>Mobile Phone:</b> 0813 1913 1973<br>
+                    <b>Email:</b> AlifRidho.Utama@fonterra.com
                 </td>
             </tr>
         </tfooter>

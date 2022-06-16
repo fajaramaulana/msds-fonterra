@@ -1,6 +1,6 @@
 @extends('admin.template-admin.master')
 @section('title', 'MSDS')
-@section('sub-judul', 'Edit MSDS')
+@section('sub-judul', 'Edit Hazardous')
 @section('content')
     <form method="POST" id="form-portofolio" enctype="multipart/form-data">
         @csrf
@@ -119,7 +119,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Departement<span style="color:red;">*</span></label>
+                    <label>Bulk Storage Tank<span style="color:red;">*</span></label>
                     <select class="form-control " name="bulk_storage_tank" id="bulk_storage_tank">
                         <option value="0" holder>Status</option>
                         <option value="1" {{ $msds->bulk_storage_tank == 1 ? 'selected' : '' }}>Yes</option>
@@ -153,7 +153,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Dokumen<span style="color:red;">*</span></label>
+                <label>Dokumen</label>
                 @if ($msds->path_pdf == null)
                     <input type="file" class="form-control" id="dokumen" name="dokumen" onChange="validate(this.value)">
                 @else
@@ -174,7 +174,8 @@
         <div class="spinner-border"></div>
         <div class="form-group">
             <a class="btn btn-danger btn-sm" onclick="history.back()" style="color: white;">Back</a>
-            <button class="btn btn-primary btn-sm" type="submit">Update MSDS</button>
+            <button class="btn btn-primary btn-sm" type="submit">Update 
+Hazardous</button>
         </div>
     </form>
     <script src="{{ asset('assets/modules/sweetalert/sweetalert.min.js') }}"></script>

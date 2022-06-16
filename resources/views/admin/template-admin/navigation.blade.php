@@ -34,9 +34,12 @@
         <a href="{{ route('home')}}">Admin</a>
       </div>
       <ul class="sidebar-menu">
-        <li class="{{ request()->is('msds','msds/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('msds.index')}}"><i class="fas fa-list-alt"></i> <span>MSDS</span></a></li>
-        <li class="{{ request()->is('departement','departement/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('departement.index')}}"><i class="fas fa-question"></i><span>Departement</span></a></li>
-        <li class="{{ request()->is('user','user/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('user.index')}}"><i class="fas fa-users-cog"></i> <span>List User</span></a></li>
+        <li class="{{ request()->is('msds','msds/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('msds.index')}}"><i class="fas 
+fa-list-alt"></i> <span>Hazardous Register</span></a></li>
+        <li class="{{ request()->is('departement','departement/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('departement.index')}}"><i 
+class="fas fa-question"></i><span>User</span></a></li>
+        <li class="{{ request()->is('user','user/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('user.index')}}"><i class="fas 
+fa-users-cog"></i> <span>List User Aplikasi</span></a></li>
       </ul>
     </aside>
   </div>

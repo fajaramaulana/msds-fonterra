@@ -1,6 +1,6 @@
 @extends('admin.template-admin.master')
 @section('title', 'MSDS')
-@section('sub-judul', 'Tambah MSDS')
+@section('sub-judul', 'Tambah Hazardous')
 @section('content')
     <form method="POST" id="form-portofolio" enctype="multipart/form-data">
         @csrf
@@ -115,7 +115,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Departement<span style="color:red;">*</span></label>
+                    <label>Bulk Storage Tank<span style="color:red;">*</span></label>
                     <select class="form-control " name="bulk_storage_tank" id="bulk_storage_tank">
                         <option value="0" holder>Status</option>
                         <option value="1">Yes</option>
@@ -149,7 +149,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Dokumen<span style="color:red;">*</span></label>
+                <label>Dokumen</label>
                 <input type="file" class="form-control" id="dokumen" name="dokumen" onChange="validate(this.value)">
             </div>
         </div>
@@ -160,7 +160,8 @@
         </div>
         <div class="spinner-border"></div>
         <div class="form-group">
-            <button class="btn btn-primary btn-block">Simpan MSDS</button>
+            <button class="btn btn-primary btn-block">Simpan 
+Hazardous</button>
         </div>
     </form>
     <script src="{{ asset('assets/modules/sweetalert/sweetalert.min.js') }}"></script>

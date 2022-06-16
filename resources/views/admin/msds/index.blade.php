@@ -1,6 +1,6 @@
 @extends('admin.template-admin.master')
 @section('title', 'MSDS')
-@section('sub-judul', 'List MSDS')
+@section('sub-judul', 'Hazardouse Register')
 @section('content')
     <a href="{{ route('msds.create') }}" class="btn btn-primary btn-sm">Tambah MSDS</a>
     <form method="POST" id="form-search" enctype="multipart/form-data">
@@ -32,6 +32,7 @@
                         <th>SDS Issue Date</th>
                         <th>Exipred Date</th>
                         <th>Checmical Supplier</th>
+                        <th>Created At</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -42,7 +43,8 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" tabindex="-1" role="dialog" style="z-index: 123123 !important; margin-left: 10% !important;" id="toggle-modal">
+    <div class="modal fade" tabindex="-1" role="dialog" style="z-index: 123123 !important; margin-left: 10% !important;"
+        id="toggle-modal">
         <div class="modal-dialog modal-lg" style="min-width: 900px" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -90,7 +92,7 @@
                         </div>
                         <div class="col-sm-6">
                             <label style="font-weight: 800">Dokumen</label><br>
-                            <a id="document" class="btn btn-sm btn-primary">Download Dokumen</a>
+                            <a id="document" target="_blank" class="btn btn-sm btn-primary">Download Dokumen</a>
                         </div>
                     </div>
                 </div>
@@ -124,6 +126,7 @@
                         departement_id: departement_id,
                     }
                 },
+                order : [[6, 'desc']],
                 columns: [{
                         data: 'cas_number',
                         name: 'cas_number'
@@ -146,11 +149,17 @@
                     },
                     {
                         data: 'chemical_supplier',
-                        name: 'chemical_supplier'
+                        name: 'chemical_supplier',
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
+                        visible: false
                     },
                     {
                         data: 'action',
                         name: 'action',
+                        width: '10%',
                         orderable: false,
                         searchable: false
                     },
@@ -159,10 +168,10 @@
 
         });
 
-        function edit(id, title) {
+        function edit(id) {
             swal({
                 title: `Warning`,
-                text: `Apakah anda yakin ingin mengedit MSDS ${title}`,
+                text: `Apakah anda yakin ingin mengedit MSDS`,
                 type: 'warning',
                 buttons: {
                     confirm: {
@@ -182,17 +191,81 @@
             });
         };
 
+        function hapus(id) {
+            swal({
+                title: `Warning`,
+                text: `Apakah anda yakin ingin mengahpus MSDS ini?`,
+                type: 'warning',
+                buttons: {
+                    confirm: {
+                        text: 'Ya',
+                        className: 'btn btn-success'
+                    },
+                    cancel: {
+                        visible: true,
+                        className: 'btn btn-danger'
+                    }
+                }
+            }).then((result) => {
+                if (result == true) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ route('msds.inactive') }}',
+                        data: {
+                            id: id,
+                        },
+                        success: function(result) {
+                            if (result.success == 1) {
+                                swal({
+                                    title: "Good Job",
+                                    text: result.message,
+                                    timer: 10000,
+                                    button: false,
+                                    type: "success",
+                                    icon: 'success'
+                                }).then(() => {
+                                    window.location.href = "{{ url('/msds') }}";
+                                })
+                            } else if (result.success == 2) {
+                                swal({
+                                    title: "Pesan Eror",
+                                    text: result.message,
+                                    timer: 10000,
+                                    button: false,
+                                    type: "error",
+                                    icon: 'error'
+                                })
+                            } else {
+                                var values = '';
+                                jQuery.each(result.message, function(key, value) {
+                                    values += `\n ${value}`
+                                });
+
+                                swal({
+                                    title: "Error Validation",
+                                    text: values,
+                                    timer: 10000,
+                                    button: false,
+                                    type: "error",
+                                    icon: 'error'
+                                })
+                            }
+                        }
+                    })
+                }
+            });
+        };
+
         $('#toggle-modal').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             var recipient = button.data('throw'); // Extract info from data-* attributes
             $.ajax({
                 type: 'GET',
-                url: '{{ route('msds.getbyid',) }}',
+                url: '{{ route('msds.getbyid') }}',
                 data: {
                     idlog: recipient,
                 },
                 success: function(data) {
-                    console.log(data)
                     $('#staticBackdropLabel').html(`MSDS ${data.chemical_common_name}`);
                     $('#chemical_common_name').html(data.chemical_common_name);
                     $('#chemical_supplier').html(data.chemical_supplier);
@@ -202,7 +275,14 @@
                     $('#trade_name').html(data.trade_name);
                     $('#location_of_chemical').html(data.location_of_chemical);
                     let a = document.getElementById('document');
-                    a.href = "{{ asset('dokumen/') }}"+"/"+data.path_pdf;
+                    if (data.path_pdf == null) {
+                        a.href = '#';
+                        a.innerHTML = 'Tidak Ada Dokumen';
+                        a.setAttribute('readonly', 'readonly');
+                    } else {
+                        a.href = `{{ asset('dokumen') }}/${data.path_pdf}`;
+                        a.innerHTML = 'Download Dokumen';
+                    }
                 }
             })
         });

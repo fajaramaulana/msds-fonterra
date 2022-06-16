@@ -1,6 +1,6 @@
 @extends('admin.template-admin.master')
 @section('title', 'Deparetement')
-@section('sub-judul', 'Departement')
+@section('sub-judul', 'List User')
 @section('content')
     <a href="{{ route('departement.create') }}" class="btn btn-primary btn-sm">Tambah Departement</a>
     <div class="container mt-2">

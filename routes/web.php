@@ -34,5 +34,6 @@ Route::group(['middleware' => ['auth', 'prevent-back-history']], function () {
     Route::resource('/msds', 'MsdsController');
     Route::post('/removepdfmsds', 'MsdsController@removePdfMsds')->name('msds.removePdf');
     Route::get('/getbyid', 'MsdsController@getbyid')->name('msds.getbyid');
+    Route::post('/setinactive', 'MsdsController@inactive')->name('msds.inactive');
     Route::resource('/departement', 'DepartementController');
 });
