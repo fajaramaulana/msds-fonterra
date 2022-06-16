@@ -21,32 +21,6 @@
                     </form>
                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
              document.getElementById('logout-form').submit();">
-<<<<<<< HEAD
-            {{ __('Logout') }}
-          </a>
-        </div>
-      </li>
-    </ul>
-  </nav>
-  <div class="main-sidebar sidebar-style-2">
-    <aside id="sidebar-wrapper">
-      <div class="sidebar-brand">
-        <a href="{{ route('home')}}">Admin </a>
-      </div>
-      <div class="sidebar-brand sidebar-brand-sm">
-        <a href="{{ route('home')}}">Admin</a>
-      </div>
-      <ul class="sidebar-menu">
-        <li class="{{ request()->is('msds','msds/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('msds.index')}}"><i class="fas 
-fa-list-alt"></i> <span>Hazardous Register</span></a></li>
-        <li class="{{ request()->is('departement','departement/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('departement.index')}}"><i 
-class="fas fa-question"></i><span>User</span></a></li>
-        <li class="{{ request()->is('user','user/*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('user.index')}}"><i class="fas 
-fa-users-cog"></i> <span>List User Aplikasi</span></a></li>
-      </ul>
-    </aside>
-  </div>
-=======
                         {{ __('Logout') }}
                     </a>
                 </div>
@@ -76,4 +50,3 @@ fa-users-cog"></i> <span>List User Aplikasi</span></a></li>
             </ul>
         </aside>
     </div>
->>>>>>> 68ddd627dc73663bdfd71b4f3cb7c7ba6ff8910a
